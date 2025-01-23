@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <h1>フォルダ複製</h1>
+    <form>
+      <label for="sourceFolderUrl">ソースフォルダURL:</label>
+      <input type="text" id="sourceFolderUrl" name="sourceFolderUrl"><br><br>
+      <label for="targetFolderUrl">複製先フォルダURL:</label>
+      <input type="text" id="targetFolderUrl" name="targetFolderUrl"><br><br>
+      <input type="button" value="フォルダを複製" onclick="copyFolder()">
+    </form>
+    <div id="copyingMessage" style="display: none; color: blue;">複製中です...</div>
+    <div id="successMessage" style="display: none; color: green;">成功しました！</div>
+    <script>
+      function extractFolderIdFromUrl(url) {
+        var match = /\/folders\/([^/?]+)/.exec(url);
+        if (match && match.length > 1) {
+          return match[1];
+        } else {
+          return null;
+        }
+      }
+    function copyFolder() {
+      var sourceFolderUrl = document.getElementById('sourceFolderUrl').value;
+      var targetFolderUrl = document.getElementById('targetFolderUrl').value;
+      var sourceFolderId = extractFolderIdFromUrl(sourceFolderUrl);
+      var targetFolderId = extractFolderIdFromUrl(targetFolderUrl);
+      if (sourceFolderId && targetFolderId) {
+        document.getElementById('copyingMessage').style.display = 'block'; // 複製中メッセージを表示
+        google.script.run.withSuccessHandler(function() {
+          document.getElementById('copyingMessage').style.display = 'none'; // 複製が成功したら非表示にする
+          document.getElementById('successMessage').style.display = 'block'; // 成功メッセージを表示
+        }).withFailureHandler(function() {
+          document.getElementById('copyingMessage').style.display = 'none'; // 複製が失敗したら非表示にする
+          alert('複製に失敗しました。');
+        }).copyFolderAndContents(sourceFolderId, targetFolderId);
+      } else {
+        alert('正しいフォルダURLを入力してください。');
+      }
+    }
+    </script>
+  </body>
+</html>
